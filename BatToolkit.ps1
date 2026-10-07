@@ -1,4 +1,4 @@
-﻿# BAT TOOLKIT - compiled single file build. Do not edit: edit src and run Build.ps1
+# BAT TOOLKIT - compiled single file build. Do not edit: edit src and run Build.ps1
 $global:BatEmbedded = @{}
 $global:BatEntry = $PSCommandPath
 $global:BatChild = ($args -contains '--child')
