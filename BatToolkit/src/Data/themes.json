@@ -1,0 +1,34 @@
+{
+  "default": "dark",
+  "palette": "Sage peridot morning  #345C32 deep green  #9CAC54 peridot  #A7F0DD mint  #97CD97 sage",
+  "themes": {
+    "dark": {
+      "Bg": "#0E1A11",
+      "Side": "#14261A",
+      "Panel": "#1A2F1F",
+      "Panel2": "#345C32",
+      "Line": "#2F5434",
+      "Fg": "#E6F5EC",
+      "Dim": "#9DB8A5",
+      "Accent": "#A7F0DD",
+      "Accent2": "#9CAC54",
+      "Hover": "#97CD97",
+      "OnHover": "#0E1A11",
+      "OnAccent": "#0E1A11"
+    },
+    "light": {
+      "Bg": "#F1F7EE",
+      "Side": "#E3EFDC",
+      "Panel": "#FFFFFF",
+      "Panel2": "#D9EAD2",
+      "Line": "#C3D9BA",
+      "Fg": "#1B3320",
+      "Dim": "#5F7A63",
+      "Accent": "#345C32",
+      "Accent2": "#9CAC54",
+      "Hover": "#A7F0DD",
+      "OnHover": "#12281A",
+      "OnAccent": "#FFFFFF"
+    }
+  }
+}

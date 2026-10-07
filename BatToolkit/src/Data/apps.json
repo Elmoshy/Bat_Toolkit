@@ -1,0 +1,98 @@
+{
+  "categories": [
+    { "name": "Essentials", "apps": [
+      {"name":"7-Zip","winget":"7zip.7zip","choco":"7zip","desc":"File archiver"},
+      {"name":"VLC media player","winget":"VideoLAN.VLC","choco":"vlc","desc":"Plays almost any media"},
+      {"name":"Notepad++","winget":"Notepad++.Notepad++","choco":"notepadplusplus","desc":"Text and code editor"},
+      {"name":"Everything","winget":"voidtools.Everything","choco":"everything","desc":"Instant file search"},
+      {"name":"SumatraPDF","winget":"SumatraPDF.SumatraPDF","choco":"sumatrapdf","desc":"Light PDF reader"},
+      {"name":"PowerToys","winget":"Microsoft.PowerToys","choco":"powertoys","desc":"Microsoft power user tools"},
+      {"name":"Bitwarden","winget":"Bitwarden.Bitwarden","choco":"bitwarden","desc":"Password manager"},
+      {"name":"WinRAR","winget":"RARLab.WinRAR","choco":"winrar","desc":"Archiver"},
+      {"name":"ShareX","winget":"ShareX.ShareX","choco":"sharex","desc":"Screenshots and screen recording"},
+      {"name":"qBittorrent","winget":"qBittorrent.qBittorrent","choco":"qbittorrent","desc":"Torrent client"}
+    ]},
+    { "name": "Browsers", "apps": [
+      {"name":"Google Chrome","winget":"Google.Chrome","choco":"googlechrome","desc":"Web browser"},
+      {"name":"Mozilla Firefox","winget":"Mozilla.Firefox","choco":"firefox","desc":"Web browser"},
+      {"name":"Brave","winget":"Brave.Brave","choco":"brave","desc":"Privacy focused browser"},
+      {"name":"Opera","winget":"Opera.Opera","choco":"opera","desc":"Web browser"},
+      {"name":"Vivaldi","winget":"Vivaldi.Vivaldi","choco":"vivaldi","desc":"Customizable browser"},
+      {"name":"Tor Browser","winget":"TorProject.TorBrowser","choco":"tor-browser","desc":"Anonymous browsing"}
+    ]},
+    { "name": "Development", "apps": [
+      {"name":"Visual Studio Code","winget":"Microsoft.VisualStudioCode","choco":"vscode","desc":"Code editor"},
+      {"name":"Git","winget":"Git.Git","choco":"git","desc":"Version control"},
+      {"name":"GitHub Desktop","winget":"GitHub.GitHubDesktop","choco":"github-desktop","desc":"Git GUI"},
+      {"name":"Python 3.12","winget":"Python.Python.3.12","choco":"python312","desc":"Python runtime"},
+      {"name":"Node.js LTS","winget":"OpenJS.NodeJS.LTS","choco":"nodejs-lts","desc":"JavaScript runtime"},
+      {"name":"PowerShell 7","winget":"Microsoft.PowerShell","choco":"powershell-core","desc":"Modern PowerShell"},
+      {"name":"Windows Terminal","winget":"Microsoft.WindowsTerminal","choco":"microsoft-windows-terminal","desc":"Terminal app"},
+      {"name":"Docker Desktop","winget":"Docker.DockerDesktop","choco":"docker-desktop","desc":"Containers"},
+      {"name":"Postman","winget":"Postman.Postman","choco":"postman","desc":"API testing"},
+      {"name":"DBeaver","winget":"DBeaver.DBeaver.Community","choco":"dbeaver","desc":"Database client"},
+      {"name":"IntelliJ IDEA Community","winget":"JetBrains.IntelliJIDEA.Community","choco":"intellijidea-community","desc":"Java IDE"},
+      {"name":"Temurin JDK 21","winget":"EclipseAdoptium.Temurin.21.JDK","choco":"temurin21","desc":"Java JDK"},
+      {"name":".NET SDK 8","winget":"Microsoft.DotNet.SDK.8","choco":"dotnet-8.0-sdk","desc":".NET SDK"},
+      {"name":"Go","winget":"GoLang.Go","choco":"golang","desc":"Go language"},
+      {"name":"WinSCP","winget":"WinSCP.WinSCP","choco":"winscp","desc":"SFTP and SCP client"},
+      {"name":"PuTTY","winget":"PuTTY.PuTTY","choco":"putty","desc":"SSH client"},
+      {"name":"WinMerge","winget":"WinMerge.WinMerge","choco":"winmerge","desc":"Diff and merge"}
+    ]},
+    { "name": "Utilities", "apps": [
+      {"name":"WinDirStat","winget":"WinDirStat.WinDirStat","choco":"windirstat","desc":"Disk usage viewer"},
+      {"name":"CPU-Z","winget":"CPUID.CPU-Z","choco":"cpu-z","desc":"Hardware info"},
+      {"name":"HWMonitor","winget":"CPUID.HWMonitor","choco":"hwmonitor","desc":"Hardware sensors"},
+      {"name":"Rufus","winget":"Rufus.Rufus","choco":"rufus","desc":"Bootable USB creator"},
+      {"name":"Balena Etcher","winget":"Balena.Etcher","choco":"etcher","desc":"Flash images to USB"},
+      {"name":"AutoHotkey","winget":"AutoHotkey.AutoHotkey","choco":"autohotkey","desc":"Automation scripting"},
+      {"name":"MSI Afterburner","winget":"Guru3D.Afterburner","choco":"msiafterburner","desc":"GPU tuning"},
+      {"name":"TeamViewer","winget":"TeamViewer.TeamViewer","choco":"teamviewer","desc":"Remote access"},
+      {"name":"AnyDesk","winget":"AnyDesk.AnyDesk","choco":"anydesk","desc":"Remote access"}
+    ]},
+    { "name": "Communications", "apps": [
+      {"name":"Discord","winget":"Discord.Discord","choco":"discord","desc":"Chat and voice"},
+      {"name":"Telegram","winget":"Telegram.TelegramDesktop","choco":"telegram","desc":"Messenger"},
+      {"name":"WhatsApp","winget":"WhatsApp.WhatsApp","choco":"whatsapp","desc":"Messenger"},
+      {"name":"Zoom","winget":"Zoom.Zoom","choco":"zoom","desc":"Video meetings"},
+      {"name":"Microsoft Teams","winget":"Microsoft.Teams","choco":"microsoft-teams","desc":"Meetings and chat"},
+      {"name":"Slack","winget":"SlackTechnologies.Slack","choco":"slack","desc":"Team chat"},
+      {"name":"Thunderbird","winget":"Mozilla.Thunderbird","choco":"thunderbird","desc":"Email client"}
+    ]},
+    { "name": "Documents", "apps": [
+      {"name":"Adobe Acrobat Reader","winget":"Adobe.Acrobat.Reader.64-bit","choco":"adobereader","desc":"PDF reader"},
+      {"name":"LibreOffice","winget":"TheDocumentFoundation.LibreOffice","choco":"libreoffice-fresh","desc":"Office suite"},
+      {"name":"Foxit PDF Reader","winget":"Foxit.FoxitReader","choco":"foxitreader","desc":"PDF reader"},
+      {"name":"Obsidian","winget":"Obsidian.Obsidian","choco":"obsidian","desc":"Markdown notes"},
+      {"name":"Notion","winget":"Notion.Notion","choco":"notion","desc":"Notes and workspace"},
+      {"name":"Calibre","winget":"calibre.calibre","choco":"calibre","desc":"Ebook manager"}
+    ]},
+    { "name": "Multimedia", "apps": [
+      {"name":"OBS Studio","winget":"OBSProject.OBSStudio","choco":"obs-studio","desc":"Recording and streaming"},
+      {"name":"Audacity","winget":"Audacity.Audacity","choco":"audacity","desc":"Audio editor"},
+      {"name":"Spotify","winget":"Spotify.Spotify","choco":"spotify","desc":"Music streaming"},
+      {"name":"HandBrake","winget":"HandBrake.HandBrake","choco":"handbrake","desc":"Video transcoder"},
+      {"name":"GIMP","winget":"GIMP.GIMP","choco":"gimp","desc":"Image editor"},
+      {"name":"Inkscape","winget":"Inkscape.Inkscape","choco":"inkscape","desc":"Vector graphics"},
+      {"name":"Krita","winget":"KDE.Krita","choco":"krita","desc":"Digital painting"},
+      {"name":"Blender","winget":"BlenderFoundation.Blender","choco":"blender","desc":"3D creation"},
+      {"name":"Kdenlive","winget":"KDE.Kdenlive","choco":"kdenlive","desc":"Video editor"},
+      {"name":"K-Lite Codec Pack Mega","winget":"CodecGuide.K-LiteCodecPack.Mega","choco":"k-litecodecpackmega","desc":"Codecs and player"},
+      {"name":"IrfanView","winget":"IrfanSkiljan.IrfanView","choco":"irfanview","desc":"Image viewer"}
+    ]},
+    { "name": "Gaming", "apps": [
+      {"name":"Steam","winget":"Valve.Steam","choco":"steam","desc":"Game store"},
+      {"name":"Epic Games Launcher","winget":"EpicGames.EpicGamesLauncher","choco":"epicgameslauncher","desc":"Game store"},
+      {"name":"GOG Galaxy","winget":"GOG.Galaxy","choco":"goggalaxy","desc":"Game library"},
+      {"name":"EA app","winget":"ElectronicArts.EADesktop","choco":"ea-app","desc":"EA games"},
+      {"name":"Ubisoft Connect","winget":"Ubisoft.Connect","choco":"ubisoft-connect","desc":"Ubisoft games"}
+    ]},
+    { "name": "Runtimes", "apps": [
+      {"name":"VC++ 2015-2022 x64","winget":"Microsoft.VCRedist.2015+.x64","choco":"vcredist140","desc":"Visual C++ runtime"},
+      {"name":".NET Desktop Runtime 8","winget":"Microsoft.DotNet.DesktopRuntime.8","choco":"dotnet-8.0-desktopruntime","desc":".NET runtime"},
+      {"name":"Java Runtime","winget":"Oracle.JavaRuntimeEnvironment","choco":"javaruntime","desc":"Java JRE"},
+      {"name":"DirectX End-User Runtime","winget":"Microsoft.DirectX","choco":"directx","desc":"DirectX libraries"},
+      {"name":"WebView2 Runtime","winget":"Microsoft.EdgeWebView2Runtime","choco":"webview2-runtime","desc":"Embedded web runtime"}
+    ]}
+  ]
+}
