@@ -1,3 +1,4 @@
+```markdown
 <div align="center">
 
 # 🦇 BatToolkit
@@ -19,3 +20,67 @@ Open **PowerShell as Administrator** and run:
 
 ```powershell
 irm [https://tinyurl.com/bat-toolkit](https://tinyurl.com/bat-toolkit) | iex
+
+```
+
+*(Or via direct GitHub URL)*:
+
+```powershell
+irm [https://raw.githubusercontent.com/Elmoshy/Bat_Toolkit/main/BatToolkit.ps1](https://raw.githubusercontent.com/Elmoshy/Bat_Toolkit/main/BatToolkit.ps1) | iex
+
+```
+
+---
+
+## 🌟 Key Features
+
+* **📦 App Installer:** Quickly install popular applications using `winget` and `chocolatey`, categorized for essential tools, browsers, dev suites, and gaming.
+* **🗑️ Smart Debloater:** Scan and purge unnecessary pre-installed Windows UWP apps while safeguarding vital system components.
+* **⚡ System Tweaks:** Enhance responsiveness, improve privacy settings, and disable unwanted background telemetry.
+* **🧹 Cache Cleaner:** Reclaim disk space by clearing temporary files, logs, and system garbage.
+
+---
+
+## 🛡️ Built-in Safety Controls
+
+BatToolkit enforces a **Hard Protection List** to prevent accidental removal of core Windows components, ensuring system stability:
+
+* Windows Store & Installer (`Microsoft.WindowsStore`, `Microsoft.DesktopAppInstaller`)
+* Windows Security Center (`Microsoft.SecHealthUI`)
+* Core Runtimes & Shell Extensions (`Microsoft.VCLibs`, `.NET Native`, `WebView2`)
+
+---
+
+## 🛠️ Included Applications
+
+| Category | Apps |
+| --- | --- |
+| **Essentials** | 7-Zip, VLC, Notepad++, Everything, SumatraPDF, PowerToys, Bitwarden, WinRAR, ShareX, qBittorrent |
+| **Browsers** | Google Chrome, Mozilla Firefox, Brave, Opera, Vivaldi, Tor Browser |
+| **Development** | VS Code, Git, GitHub Desktop, Python 3.12, Node.js LTS, PowerShell 7, Windows Terminal, Docker Desktop, Postman |
+| **Utilities** | WinDirStat, CPU-Z, HWMonitor, Rufus, Balena Etcher, AutoHotkey, MSI Afterburner, TeamViewer, AnyDesk |
+| **Communications** | Discord, Telegram, WhatsApp, Zoom, Microsoft Teams, Slack, Thunderbird |
+| **Multimedia** | OBS Studio, Audacity, Spotify, HandBrake, GIMP, Inkscape, Krita, Blender |
+| **Gaming** | Steam, Epic Games Launcher, GOG Galaxy, EA app, Ubisoft Connect |
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! If you want to add new apps, improve scripts, or report bugs:
+
+1. Fork the Repository
+2. Create a Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit Changes (`git commit -m 'Add AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
+
+## 📜 License
+
+Distributed under the **MIT License**. See [LICENSE](https://www.google.com/search?q=LICENSE) for details.
+
+```
+
+```
