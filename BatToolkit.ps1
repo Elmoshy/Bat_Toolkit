@@ -2113,6 +2113,35 @@ $global:BatEmbedded['MainWindow.xaml'] = @'
       <Setter Property="Margin" Value="0"/>
       <Setter Property="StrokeThickness" Value="1.7"/>
     </Style>
+    <Style x:Key="SwitchToggle" TargetType="ToggleButton">
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Focusable" Value="False"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="ToggleButton">
+            <Grid Width="42" Height="22" Background="Transparent">
+              <Border x:Name="Track" CornerRadius="11" Background="{DynamicResource Panel2}" BorderBrush="{DynamicResource Line}" BorderThickness="1"/>
+              <Ellipse x:Name="Knob" Width="14" Height="14" Fill="{DynamicResource Dim}" HorizontalAlignment="Left" Margin="4,0,0,0"/>
+            </Grid>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="Track" Property="BorderBrush" Value="{DynamicResource Accent}"/>
+              </Trigger>
+              <Trigger Property="IsChecked" Value="True">
+                <Setter TargetName="Track" Property="Background" Value="{DynamicResource Accent}"/>
+                <Setter TargetName="Track" Property="BorderBrush" Value="{DynamicResource Accent}"/>
+                <Setter TargetName="Knob" Property="Fill" Value="{DynamicResource OnAccent}"/>
+                <Setter TargetName="Knob" Property="HorizontalAlignment" Value="Right"/>
+                <Setter TargetName="Knob" Property="Margin" Value="0,0,4,0"/>
+              </Trigger>
+              <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.4"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
     <!-- Card used by the app catalog: clear contrast on hover -->
     <Style x:Key="AppCard" TargetType="Border">
       <Setter Property="Background" Value="Transparent"/>
@@ -2776,22 +2805,36 @@ $global:BatEmbedded['MainWindow.xaml'] = @'
 
         <!-- TWEAKS -->
         <Grid x:Name="PageTweaks" Visibility="Collapsed">
-          <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
-          <StackPanel Margin="0,0,0,10">
-            <WrapPanel Margin="0,0,0,6">
-              <Button x:Name="BtnRestoreTweaks" Content="Create Restore Point"/>
-              <Button x:Name="BtnRefreshTweaks" Content="Refresh Status"/>
-              <Button x:Name="BtnTweakRecommended" Content="Select Recommended"/>
-              <Button x:Name="BtnTweakNone" Content="Select None"/>
-              <Button x:Name="BtnApplyTweaks" Content="Apply Selected"/>
-              <Button x:Name="BtnUndoTweaks" Content="Undo Selected"/>
-              <CheckBox x:Name="ChkTweakRestore" Content="Restore point before applying" IsChecked="True" VerticalAlignment="Center" Margin="4,0,0,8"/>
+          <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+          <WrapPanel Grid.Row="0" Margin="0,0,0,10">
+            <TextBlock Text="Recommended selections:" Style="{StaticResource Dimmed}" VerticalAlignment="Center" Margin="0,0,12,8"/>
+            <Button x:Name="BtnPresetStandard" Content="Standard"/>
+            <Button x:Name="BtnPresetMinimal" Content="Minimal"/>
+            <Button x:Name="BtnPresetAdvanced" Content="Advanced"/>
+            <Button x:Name="BtnPresetClear" Content="Clear"/>
+            <Button x:Name="BtnTweakScan" Content="Get Installed Tweaks"/>
+            <Button x:Name="BtnPresetAppx" Content="AppX Removal"/>
+            <Button x:Name="BtnRestoreTweaks" Content="Create Restore Point"/>
+          </WrapPanel>
+          <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="12"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+            <Border Grid.Column="0" Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Line}" BorderThickness="1" CornerRadius="12">
+              <ScrollViewer VerticalScrollBarVisibility="Auto"><StackPanel x:Name="TweakLeft" Margin="16,8,16,14"/></ScrollViewer>
+            </Border>
+            <Border Grid.Column="2" Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Line}" BorderThickness="1" CornerRadius="12">
+              <ScrollViewer VerticalScrollBarVisibility="Auto"><StackPanel x:Name="TweakRight" Margin="16,8,16,14"/></ScrollViewer>
+            </Border>
+          </Grid>
+          <StackPanel Grid.Row="2" Margin="0,10,0,0">
+            <TextBlock x:Name="TweakCounter" Style="{StaticResource Dimmed}" Margin="0,0,0,4"/>
+            <TextBlock Style="{StaticResource Dimmed}" TextWrapping="Wrap" Margin="0,0,0,8"
+                       Text="Hover over (?) for details. Many of these tweaks heavily modify the system, so be careful. Tick boxes on the left and press Run Tweaks. Switches, the list and the buttons on the right apply immediately. Current values are saved first so they can be undone."/>
+            <WrapPanel>
+              <Button x:Name="BtnApplyTweaks" Content="Run Tweaks"/>
+              <Button x:Name="BtnUndoTweaks" Content="Undo Selected Tweaks"/>
+              <CheckBox x:Name="ChkTweakRestore" Content="Restore point before Run Tweaks" IsChecked="True" VerticalAlignment="Center" Margin="4,0,0,8"/>
             </WrapPanel>
-            <TextBlock x:Name="TweakCounter" Style="{StaticResource Dimmed}"/>
           </StackPanel>
-          <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-            <StackPanel x:Name="TweakHost" Margin="0,0,8,0"/>
-          </ScrollViewer>
         </Grid>
 
         <!-- FIXES / DNS -->
@@ -3777,10 +3820,12 @@ function Get-BatCategoryName {
 }
 
 function New-BatTweakObject {
-    param($Id, $Name, $Desc, $Cat, $Type, $Risk, $Min, $Max, $Raw)
+    param($Id, $Name, $Desc, $Cat, $Type, $Risk, $Min, $Max, $Raw,
+        [string]$ComboGroup = '', [string]$ComboTitle = '', [int]$ComboIndex = 0, [string]$ComboOption = '')
     [pscustomobject]@{
         Id = $Id; Name = $Name; Desc = $Desc; Category = $Cat; Type = $Type
         Risk = $Risk; MinBuild = $Min; MaxBuild = $Max; Raw = $Raw
+        ComboGroup = $ComboGroup; ComboTitle = $ComboTitle; ComboIndex = $ComboIndex; ComboOption = $ComboOption
     }
 }
 
@@ -3791,8 +3836,8 @@ function Get-BatTweakList {
         $t = $p.Value
         if ($null -eq $t -or $p.Name.StartsWith('_')) { continue }
         $id = [string]$p.Name
-        # Covered elsewhere in BatToolkit: DNS page, Clean C:, and the Ultimate Performance undo
-        if (@('WPFchangedns', 'WPFOOSUbutton', 'WPFTweaksDiskCleanup', 'WPFTweaksDeleteTempFiles', 'WPFRemoveUltPerf') -contains $id) { continue }
+        # DNS is a dedicated combobox built by the UI (it uses the BatToolkit DNS providers)
+        if ($id -eq 'WPFchangedns') { continue }
         $o = $over[$id]
         if (-not $o) { $o = @{} }
         $cat = Get-BatCategoryName ([string]$t.category)
@@ -3811,13 +3856,14 @@ function Get-BatTweakList {
         if ($o.maxBuild) { $max = [int]$o.maxBuild }
 
         # Combobox with per option registry values (for example Multiplane Overlay):
-        # every option except the first (the Windows default) becomes its own tweak
+        # one entry per option, index 0 is the Windows default (does nothing by itself)
         if ($type -eq 'Combobox' -and $t.ComboItems -and @($t.registry).Count -gt 0 -and $t.registry[0].Values) {
             $opts = @(([string]$t.ComboItems) -split '\|')
-            for ($k = 1; $k -lt $opts.Count; $k++) {
+            for ($k = 0; $k -lt $opts.Count; $k++) {
                 $opt = $opts[$k]
                 $regs = @()
                 foreach ($r in @($t.registry)) {
+                    if ($k -eq 0) { break }
                     $v = $r.Values.PSObject.Properties[$opt]
                     $d0 = $r.Values.PSObject.Properties[$opts[0]]
                     if (-not $v) { continue }
@@ -3828,7 +3874,7 @@ function Get-BatTweakList {
                 $od = ''
                 if ($t.ComboDescriptions) { $dp = $t.ComboDescriptions.PSObject.Properties[$opt]; if ($dp) { $od = [string]$dp.Value } }
                 $raw = [pscustomobject]@{ registry = $regs; service = @(); ScheduledTask = @(); InvokeScript = @(); UndoScript = @(); check = ''; restartExplorer = $false }
-                New-BatTweakObject -Id "$id::$opt" -Name "${title}: $opt" -Desc $od -Cat $cat -Type 'Checkbox' -Risk $risk -Min $min -Max $max -Raw $raw
+                New-BatTweakObject -Id "$id::$opt" -Name "${title}: $opt" -Desc $od -Cat $cat -Type 'ComboOption' -Risk $risk -Min $min -Max $max -Raw $raw -ComboGroup $id -ComboTitle $title -ComboIndex $k -ComboOption $opt
             }
             continue
         }
@@ -3852,17 +3898,7 @@ function Get-BatTweakList {
         $chk = ''
         if ($o.check) { $chk = [string]$o.check } elseif ($t.check) { $chk = [string]$t.check }
 
-        # WinUtil toggles store the value for the switch being ON. When ON is the Windows default
-        # (DefaultState true) the useful tweak is turning it OFF, so Value and OriginalValue swap.
-        if ($type -eq 'Toggle' -and $regs.Count -gt 0) {
-            $allDefault = (@($regs | Where-Object { $_.DefaultState -ne 'true' }).Count -eq 0)
-            if ($allDefault) {
-                foreach ($r in $regs) { $tmp = $r.Value; $r.Value = $r.OriginalValue; $r.OriginalValue = $tmp }
-                $tmpS = $inv; $inv = $und; $und = $tmpS
-                $title = "$title - turn off"
-            }
-            else { $title = "$title - turn on" }
-        }
+        # WinUtil toggles: Value = switch ON, OriginalValue = switch OFF. The UI shows them as switches the same way.
 
         $raw = [pscustomobject]@{ registry = $regs; service = $svc; ScheduledTask = @(); InvokeScript = $inv; UndoScript = $und; check = $chk; restartExplorer = $false }
         New-BatTweakObject -Id $id -Name $title -Desc $desc -Cat $cat -Type $type -Risk $risk -Min $min -Max $max -Raw $raw
@@ -4813,48 +4849,267 @@ function Build-BatClean {
 }
 
 # ------------------------------------------------------------ tweaks
+# Layout follows WinUtil. Left: checkbox tweaks (tick, then Run Tweaks / Undo). Right: switches that
+# apply instantly, comboboxes and one-click buttons.
 function Get-BatTweakItems {
     foreach ($i in @($global:Bat.TweakItems)) { if ($null -ne $i) { $i } }
+}
+
+function Test-BatTweakIsCheckbox {
+    param($Item)
+    $ty = [string]$Item.Data.Type
+    return ($ty -ne 'Toggle' -and $ty -ne 'Button' -and $ty -ne 'ComboOption')
 }
 
 function Update-BatTweakCounter {
     if (-not $BatUI.TweakCounter) { return }
     $all = @(Get-BatTweakItems)
-    $sel = @($all | Where-Object { $_.Checked })
+    $sel = @($all | Where-Object { (Test-BatTweakIsCheckbox $_) -and $_.Checked })
     $careful = @($sel | Where-Object { $_.Risk -eq 'Careful' }).Count
-    $applied = @($all | Where-Object { $_.Status -eq 'Applied' }).Count
-    $BatUI.TweakCounter.Text = "$($sel.Count) selected ($careful careful)   |   $applied of $($all.Count) already applied on this PC"
+    $applied = @($all | Where-Object { $_.Status -eq 'Applied' -and $_.Data.Type -ne 'ComboOption' }).Count
+    $BatUI.TweakCounter.Text = "$($sel.Count) selected ($careful careful)   |   $applied tweak(s) already applied on this PC"
+}
+
+function New-BatHelpMark {
+    param([string]$Text)
+    $q = New-Object System.Windows.Controls.TextBlock
+    $q.Text = '(?)'
+    $q.FontSize = 11
+    $q.Margin = '6,0,0,0'
+    $q.VerticalAlignment = 'Center'
+    $q.Cursor = 'Help'
+    $q.SetResourceReference([System.Windows.Controls.TextBlock]::ForegroundProperty, 'Dim')
+    $q.ToolTip = $Text
+    [System.Windows.Controls.ToolTipService]::SetShowDuration($q, 30000)
+    [System.Windows.Controls.ToolTipService]::SetInitialShowDelay($q, 200)
+    $q
+}
+
+function New-BatTweakTip {
+    param($Item)
+    $tip = [string]$Item.Desc
+    if ($Item.Risk) { $tip = ($tip + "`nRisk: " + $Item.Risk).Trim() }
+    if (-not $Item.Enabled) { $tip = ($tip + "`n" + $Item.Status).Trim() }
+    $tip
+}
+
+function New-BatSectionTitle {
+    param([string]$Text)
+    $t = New-Object System.Windows.Controls.TextBlock
+    $t.Text = $Text
+    $t.FontFamily = 'Consolas'
+    $t.FontSize = 15
+    $t.FontWeight = 'SemiBold'
+    $t.Margin = '0,10,0,6'
+    $t.SetResourceReference([System.Windows.Controls.TextBlock]::ForegroundProperty, 'Accent')
+    $t
+}
+
+function New-BatTweakCheckRow {
+    param($Item)
+    $row = New-Object System.Windows.Controls.StackPanel
+    $row.Orientation = 'Horizontal'
+    $row.Margin = '0,3,0,3'
+    $cb = New-Object System.Windows.Controls.CheckBox
+    $cb.Content = $Item.Name
+    $cb.IsEnabled = $Item.Enabled
+    $b = New-Object System.Windows.Data.Binding('Checked')
+    $b.Source = $Item
+    $b.Mode = 'TwoWay'
+    [void]$cb.SetBinding([System.Windows.Controls.Primitives.ToggleButton]::IsCheckedProperty, $b)
+    [void]$row.Children.Add($cb)
+    [void]$row.Children.Add((New-BatHelpMark (New-BatTweakTip $Item)))
+    $st = New-Object System.Windows.Controls.TextBlock
+    $st.FontSize = 11
+    $st.Margin = '10,0,0,0'
+    $st.VerticalAlignment = 'Center'
+    $st.SetResourceReference([System.Windows.Controls.TextBlock]::ForegroundProperty, 'Dim')
+    $sb = New-Object System.Windows.Data.Binding('Status')
+    $sb.Source = $Item
+    $sb.Mode = 'OneWay'
+    [void]$st.SetBinding([System.Windows.Controls.TextBlock]::TextProperty, $sb)
+    [void]$row.Children.Add($st)
+    $row
+}
+
+function Invoke-BatToggle {
+    param($Toggle)
+    $item = $Toggle.Tag
+    $on = [bool]$Toggle.IsChecked
+    if ($global:Bat.Busy) {
+        $Toggle.IsChecked = (-not $on)
+        Write-BatLog 'Another operation is still running - please wait' 'WARN'
+        return
+    }
+    if ($item.Risk -eq 'Careful' -and -not (Show-BatConfirm "'$($item.Name)' is marked CAREFUL. Continue?")) { $Toggle.IsChecked = (-not $on); return }
+    $list = @($item.Data)
+    if ($on) {
+        Invoke-BatAsync -Title "Apply: $($item.Name)" -ArgumentList @(, $list) `
+            -Work { param($list) Invoke-BatTweaks -Tweaks $list } -OnDone { param($r) Start-BatTweakScan }
+    }
+    else {
+        Invoke-BatAsync -Title "Undo: $($item.Name)" -ArgumentList @(, $list) `
+            -Work { param($list) Undo-BatTweaks -Tweaks $list } -OnDone { param($r) Start-BatTweakScan }
+    }
+}
+
+function New-BatTweakToggleRow {
+    param($Item)
+    $row = New-Object System.Windows.Controls.StackPanel
+    $row.Orientation = 'Horizontal'
+    $row.Margin = '0,4,0,4'
+    $tb = New-Object System.Windows.Controls.Primitives.ToggleButton
+    $tb.Style = $BatUI.Win.FindResource('SwitchToggle')
+    $tb.Tag = $Item
+    $tb.IsEnabled = $Item.Enabled
+    $tb.Add_Click({ param($s, $ev) Invoke-BatToggle -Toggle $s })
+    $lbl = New-Object System.Windows.Controls.TextBlock
+    $lbl.Text = $Item.Name
+    $lbl.Margin = '10,0,0,0'
+    $lbl.VerticalAlignment = 'Center'
+    [void]$row.Children.Add($tb)
+    [void]$row.Children.Add($lbl)
+    [void]$row.Children.Add((New-BatHelpMark (New-BatTweakTip $Item)))
+    $global:Bat.TweakControls[$Item.Id] = $tb
+    $row
+}
+
+function Invoke-BatTweakButton {
+    param($Button)
+    $item = $Button.Tag
+    if ($item.Risk -eq 'Careful' -and -not (Show-BatConfirm "'$($item.Name)' is marked CAREFUL and may download or change a lot. Continue?")) { return }
+    $list = @($item.Data)
+    Invoke-BatAsync -Title $item.Name -ArgumentList @(, $list) `
+        -Work { param($list) Invoke-BatTweaks -Tweaks $list } -OnDone { param($r) Start-BatTweakScan }
+}
+
+function New-BatTweakButtonRow {
+    param($Item)
+    $btn = New-Object System.Windows.Controls.Button
+    $btn.Content = $Item.Name
+    $btn.Tag = $Item
+    $btn.IsEnabled = $Item.Enabled
+    $btn.ToolTip = (New-BatTweakTip $Item)
+    $btn.HorizontalAlignment = 'Left'
+    $btn.MinWidth = 260
+    $btn.Margin = '0,4,0,4'
+    $btn.Add_Click({ param($s, $ev) Invoke-BatTweakButton -Button $s })
+    $btn
+}
+
+function Invoke-BatComboChange {
+    param($Combo)
+    if ($global:Bat.Busy) { Write-BatLog 'Another operation is still running - press Get Installed Tweaks to resync the list' 'WARN'; return }
+    $opts = @($Combo.Tag)
+    $idx = [int]$Combo.SelectedIndex
+    $undo = @($opts | Where-Object { $_.Data.ComboIndex -gt 0 } | ForEach-Object { $_.Data })
+    $apply = @($opts | Where-Object { $_.Data.ComboIndex -eq $idx -and $idx -gt 0 } | ForEach-Object { $_.Data })
+    Invoke-BatAsync -Title ('Set: ' + $opts[0].Data.ComboTitle) -ArgumentList @($undo, $apply) `
+        -Work { param($undo, $apply) Undo-BatTweaks -Tweaks $undo; if (@($apply).Count -gt 0) { Invoke-BatTweaks -Tweaks $apply } } `
+        -OnDone { param($r) Start-BatTweakScan }
+}
+
+function New-BatTweakComboRow {
+    param($Items)
+    $sorted = @($Items | Sort-Object { $_.Data.ComboIndex })
+    $row = New-Object System.Windows.Controls.StackPanel
+    $row.Orientation = 'Horizontal'
+    $row.Margin = '0,8,0,4'
+    $lbl = New-Object System.Windows.Controls.TextBlock
+    $lbl.Text = $sorted[0].Data.ComboTitle
+    $lbl.VerticalAlignment = 'Center'
+    $lbl.Margin = '0,0,10,0'
+    $cmb = New-Object System.Windows.Controls.ComboBox
+    $cmb.Width = 230
+    $cmb.Height = 28
+    $cmb.VerticalContentAlignment = 'Center'
+    foreach ($i in $sorted) { [void]$cmb.Items.Add([string]$i.Data.ComboOption) }
+    $cmb.SelectedIndex = 0
+    $cmb.Tag = $sorted
+    $cmb.IsEnabled = $sorted[0].Enabled
+    $cmb.Add_SelectionChanged({ param($s, $ev) if (-not $global:Bat.TweakUiLock) { Invoke-BatComboChange -Combo $s } })
+    [void]$row.Children.Add($lbl)
+    [void]$row.Children.Add($cmb)
+    $tip = ($sorted | ForEach-Object { $_.Data.ComboOption + ': ' + $_.Desc }) -join "`n"
+    [void]$row.Children.Add((New-BatHelpMark $tip))
+    [void]$global:Bat.TweakCombos.Add($cmb)
+    $row
+}
+
+function New-BatTweakDnsRow {
+    $providers = @((Get-BatResource 'dns.json' | ConvertFrom-Json).providers)
+    $row = New-Object System.Windows.Controls.StackPanel
+    $row.Orientation = 'Horizontal'
+    $row.Margin = '0,10,0,4'
+    $lbl = New-Object System.Windows.Controls.TextBlock
+    $lbl.Text = 'DNS - Set to:'
+    $lbl.VerticalAlignment = 'Center'
+    $lbl.Margin = '0,0,10,0'
+    $cmb = New-Object System.Windows.Controls.ComboBox
+    $cmb.Width = 230
+    $cmb.Height = 28
+    $cmb.VerticalContentAlignment = 'Center'
+    foreach ($p in $providers) { [void]$cmb.Items.Add([string]$p.name) }
+    $cmb.SelectedIndex = 0
+    $cmb.Tag = $providers
+    $cmb.Add_SelectionChanged({
+        param($s, $ev)
+        if ($global:Bat.TweakUiLock) { return }
+        $p = @($s.Tag)[[int]$s.SelectedIndex]
+        if (-not $p) { return }
+        Invoke-BatAsync -Title "Apply DNS: $($p.name)" -ArgumentList @($p.name, @($p.ipv4), @($p.ipv6)) `
+            -Work { param($n, $v4, $v6) Set-BatDns -Name $n -IPv4 $v4 -IPv6 $v6 }
+    })
+    [void]$row.Children.Add($lbl)
+    [void]$row.Children.Add($cmb)
+    [void]$row.Children.Add((New-BatHelpMark 'Changes the DNS servers of your active network adapters now. The first entry returns to automatic (DHCP).'))
+    $row
 }
 
 function Show-BatTweakGroups {
-    $panel = $BatUI.TweakHost
-    $panel.Children.Clear()
+    $left = $BatUI.TweakLeft
+    $right = $BatUI.TweakRight
+    $left.Children.Clear()
+    $right.Children.Clear()
     $global:Bat.TweakGroups = New-Object System.Collections.ArrayList
+    $global:Bat.TweakControls = @{}
+    $global:Bat.TweakCombos = New-Object System.Collections.ArrayList
+    $global:Bat.TweakUiLock = $true
     $items = @(Get-BatTweakItems)
     $cats = New-Object System.Collections.ArrayList
     foreach ($c in 'Essential Tweaks', 'Customize Preferences', 'Advanced Tweaks - CAUTION', 'Performance Plans - NOT FOR LAPTOPS') {
         if (@($items | Where-Object { $_.Group -eq $c }).Count -gt 0) { [void]$cats.Add($c) }
     }
     foreach ($i in $items) { if (-not $cats.Contains($i.Group)) { [void]$cats.Add($i.Group) } }
-    $template = $BatUI.Win.FindResource('TweakRow')
-    $first = $true
+
     foreach ($c in $cats) {
         $rows = @($items | Where-Object { $_.Group -eq $c })
-        $list = New-Object 'System.Collections.Generic.List[BatItem]'
-        foreach ($i in $rows) { $list.Add($i) }
-        $grp = New-BatGroupHeader -Title ('{0}   ({1})' -f $c, $rows.Count) -Rows $list
-        [void]$global:Bat.TweakGroups.Add($grp)
-        $ic = New-Object System.Windows.Controls.ItemsControl
-        $ic.ItemsSource = $list
-        $ic.ItemTemplate = $template
-        $ic.Margin = '28,10,4,4'
-        $exp = New-Object System.Windows.Controls.Expander
-        $exp.Header = $grp.Header
-        $exp.Content = $ic
-        $exp.IsExpanded = $first
-        $first = $false
-        [void]$panel.Children.Add($exp)
+        $isRight = ($c -match 'Customize|Performance')
+        if ($isRight) { $panel = $right } else { $panel = $left }
+
+        if ($isRight) { [void]$panel.Children.Add((New-BatSectionTitle $c)) }
+        else {
+            $list = New-Object 'System.Collections.Generic.List[BatItem]'
+            foreach ($i in $rows) { if (Test-BatTweakIsCheckbox $i) { $list.Add($i) } }
+            $grp = New-BatGroupHeader -Title $c -Rows $list
+            $grp.Header.Margin = '0,10,0,6'
+            $grp.Header.Children[1].FontFamily = New-Object System.Windows.Media.FontFamily('Consolas')
+            $grp.Header.Children[1].FontSize = 15
+            [void]$global:Bat.TweakGroups.Add($grp)
+            [void]$panel.Children.Add($grp.Header)
+        }
+        foreach ($i in $rows) {
+            $ty = [string]$i.Data.Type
+            if ($ty -eq 'Toggle') { [void]$panel.Children.Add((New-BatTweakToggleRow $i)) }
+            elseif (Test-BatTweakIsCheckbox $i) { [void]$panel.Children.Add((New-BatTweakCheckRow $i)) }
+        }
+        foreach ($cg in @($rows | Where-Object { $_.Data.Type -eq 'ComboOption' } | Group-Object { $_.Data.ComboGroup })) {
+            [void]$panel.Children.Add((New-BatTweakComboRow -Items @($cg.Group)))
+        }
+        foreach ($i in $rows) { if ($i.Data.Type -eq 'Button') { [void]$panel.Children.Add((New-BatTweakButtonRow $i)) } }
+        if ($c -match 'Advanced') { [void]$panel.Children.Add((New-BatTweakDnsRow)) }
     }
+    $global:Bat.TweakUiLock = $false
     Update-BatGroupChecks $global:Bat.TweakGroups
     Update-BatTweakCounter
 }
@@ -4878,15 +5133,37 @@ function Build-BatTweaks {
     Show-BatTweakGroups
 }
 
+function Set-BatTweakPreset {
+    param([string]$Name)
+    $minimal = @('WPFTweaksRestorePoint', 'WPFTweaksTelemetry', 'WPFTweaksActivity', 'WPFTweaksConsumerFeatures', 'WPFTweaksLocation', 'WPFTweaksDisableStoreSearch')
+    $skip = @('WPFTweaksHiber', 'WPFTweaksDisableBitLocker', 'WPFTweaksDiskCleanup', 'WPFTweaksRevertStartMenu')
+    $extra = @('WPFTweaksBraveDebloat', 'WPFTweaksEdgeDebloat', 'WPFTweaksDisableBGapps', 'WPFTweaksTeredo', 'WPFTweaksRemoveHomeAndGallery', 'WPFTweaksDisplay', 'WPFTweaksBlockAdobeNet')
+    foreach ($i in (Get-BatTweakItems)) {
+        if (-not (Test-BatTweakIsCheckbox $i)) { continue }
+        $on = $false
+        if ($i.Enabled) {
+            $std = ($i.Group -match 'Essential' -and ($skip -notcontains $i.Id))
+            if ($Name -eq 'Minimal') { $on = ($minimal -contains $i.Id) }
+            elseif ($Name -eq 'Standard') { $on = $std }
+            elseif ($Name -eq 'Advanced') { $on = ($std -or ($extra -contains $i.Id)) }
+        }
+        $i.Checked = $on
+    }
+}
+
 function Start-BatTweakScan {
+    param([switch]$SelectApplied)
     $list = @(Get-BatTweakItems | ForEach-Object { $_.Data })
     if ($list.Count -eq 0) { return }
+    $global:Bat.SelectAppliedNext = [bool]$SelectApplied
     Invoke-BatAsync -Title 'Detect tweak status' -ArgumentList @(, $list) `
         -Work { param($list) Get-BatTweakStates -Tweaks $list } `
         -OnDone {
             param($r)
             $map = @{}
             foreach ($x in @($r)) { if ($x) { $map[$x.Id] = $x.State } }
+            $selectApplied = [bool]$global:Bat.SelectAppliedNext
+            $global:Bat.SelectAppliedNext = $false
             foreach ($i in (Get-BatTweakItems)) {
                 if (-not $i.Enabled) { continue }
                 $st = $map[$i.Id]
@@ -4895,6 +5172,16 @@ function Start-BatTweakScan {
                 elseif ($st -eq 'Off') { $i.Status = 'Not applied' }
                 elseif ($i.Data.Type -eq 'Button') { $i.Status = 'Run action' }
                 else { $i.Status = 'Unknown' }
+                $ctl = $global:Bat.TweakControls[$i.Id]
+                if ($ctl) { $ctl.IsChecked = ($st -eq 'Applied') }
+                if ($selectApplied -and $st -eq 'Applied' -and (Test-BatTweakIsCheckbox $i)) { $i.Checked = $true }
+            }
+            foreach ($cmb in @($global:Bat.TweakCombos)) {
+                $idx = 0
+                foreach ($o in @($cmb.Tag)) { if ($o.Data.ComboIndex -gt 0 -and $map[$o.Id] -eq 'Applied') { $idx = [int]$o.Data.ComboIndex } }
+                $global:Bat.TweakUiLock = $true
+                $cmb.SelectedIndex = $idx
+                $global:Bat.TweakUiLock = $false
             }
             $global:Bat.TweaksScanned = $true
             Update-BatTweakCounter
@@ -4903,8 +5190,8 @@ function Start-BatTweakScan {
 
 function Start-BatTweakAction {
     param([string]$Mode)
-    $sel = @(Get-BatTweakItems | Where-Object { $_.Checked -and $_.Enabled })
-    if ($sel.Count -eq 0) { Write-BatLog 'Select at least one tweak first' 'WARN'; return }
+    $sel = @(Get-BatTweakItems | Where-Object { (Test-BatTweakIsCheckbox $_) -and $_.Checked -and $_.Enabled })
+    if ($sel.Count -eq 0) { Write-BatLog 'Tick at least one tweak on the left first' 'WARN'; return }
     $careful = @($sel | Where-Object { $_.Risk -eq 'Careful' })
     if ($careful.Count -gt 0) {
         $names = ($careful | ForEach-Object { '- ' + $_.Name }) -join "`n"
@@ -4913,7 +5200,7 @@ function Start-BatTweakAction {
     $list = @($sel | ForEach-Object { $_.Data })
     if ($Mode -eq 'Apply') {
         $rp = [bool]$BatUI.ChkTweakRestore.IsChecked
-        Invoke-BatAsync -Title "Apply $($list.Count) tweak(s)" -ArgumentList @($list, $rp) `
+        Invoke-BatAsync -Title "Run $($list.Count) tweak(s)" -ArgumentList @($list, $rp) `
             -Work { param($list, $rp) if ($rp) { New-BatRestorePoint -Description 'BAT TOOLKIT before tweaks' }; Invoke-BatTweaks -Tweaks $list } `
             -OnDone { param($r) Start-BatTweakScan }
     }
@@ -5240,9 +5527,12 @@ function Register-BatHandlers {
 
     # ---- tweaks
     $u.BtnRestoreTweaks.Add_Click({ Invoke-BatAsync -Title 'Create restore point' -Work { New-BatRestorePoint -Description 'BAT TOOLKIT manual' } })
-    $u.BtnRefreshTweaks.Add_Click({ Start-BatTweakScan })
-    $u.BtnTweakRecommended.Add_Click({ foreach ($i in (Get-BatTweakItems)) { $i.Checked = ($i.Enabled -and $i.Risk -eq 'Safe' -and $i.Status -ne 'Applied') } })
-    $u.BtnTweakNone.Add_Click({ foreach ($i in (Get-BatTweakItems)) { $i.Checked = $false } })
+    $u.BtnTweakScan.Add_Click({ Start-BatTweakScan -SelectApplied })
+    $u.BtnPresetStandard.Add_Click({ Set-BatTweakPreset 'Standard' })
+    $u.BtnPresetMinimal.Add_Click({ Set-BatTweakPreset 'Minimal' })
+    $u.BtnPresetAdvanced.Add_Click({ Set-BatTweakPreset 'Advanced' })
+    $u.BtnPresetClear.Add_Click({ foreach ($i in (Get-BatTweakItems)) { $i.Checked = $false } })
+    $u.BtnPresetAppx.Add_Click({ Show-BatPage 'Debloat' })
     $u.BtnApplyTweaks.Add_Click({ Start-BatTweakAction -Mode 'Apply' })
     $u.BtnUndoTweaks.Add_Click({ Start-BatTweakAction -Mode 'Undo' })
     $u.BtnTickSafe.Add_Click({ foreach ($i in @($BatUI.GridBloat.ItemsSource)) { $i.Checked = ($i.Risk -eq 'Safe') } })

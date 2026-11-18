@@ -73,10 +73,12 @@ function Get-BatCategoryName {
 }
 
 function New-BatTweakObject {
-    param($Id, $Name, $Desc, $Cat, $Type, $Risk, $Min, $Max, $Raw)
+    param($Id, $Name, $Desc, $Cat, $Type, $Risk, $Min, $Max, $Raw,
+        [string]$ComboGroup = '', [string]$ComboTitle = '', [int]$ComboIndex = 0, [string]$ComboOption = '')
     [pscustomobject]@{
         Id = $Id; Name = $Name; Desc = $Desc; Category = $Cat; Type = $Type
         Risk = $Risk; MinBuild = $Min; MaxBuild = $Max; Raw = $Raw
+        ComboGroup = $ComboGroup; ComboTitle = $ComboTitle; ComboIndex = $ComboIndex; ComboOption = $ComboOption
     }
 }
 
@@ -87,8 +89,8 @@ function Get-BatTweakList {
         $t = $p.Value
         if ($null -eq $t -or $p.Name.StartsWith('_')) { continue }
         $id = [string]$p.Name
-        # Covered elsewhere in BatToolkit: DNS page, Clean C:, and the Ultimate Performance undo
-        if (@('WPFchangedns', 'WPFOOSUbutton', 'WPFTweaksDiskCleanup', 'WPFTweaksDeleteTempFiles', 'WPFRemoveUltPerf') -contains $id) { continue }
+        # DNS is a dedicated combobox built by the UI (it uses the BatToolkit DNS providers)
+        if ($id -eq 'WPFchangedns') { continue }
         $o = $over[$id]
         if (-not $o) { $o = @{} }
         $cat = Get-BatCategoryName ([string]$t.category)
@@ -107,13 +109,14 @@ function Get-BatTweakList {
         if ($o.maxBuild) { $max = [int]$o.maxBuild }
 
         # Combobox with per option registry values (for example Multiplane Overlay):
-        # every option except the first (the Windows default) becomes its own tweak
+        # one entry per option, index 0 is the Windows default (does nothing by itself)
         if ($type -eq 'Combobox' -and $t.ComboItems -and @($t.registry).Count -gt 0 -and $t.registry[0].Values) {
             $opts = @(([string]$t.ComboItems) -split '\|')
-            for ($k = 1; $k -lt $opts.Count; $k++) {
+            for ($k = 0; $k -lt $opts.Count; $k++) {
                 $opt = $opts[$k]
                 $regs = @()
                 foreach ($r in @($t.registry)) {
+                    if ($k -eq 0) { break }
                     $v = $r.Values.PSObject.Properties[$opt]
                     $d0 = $r.Values.PSObject.Properties[$opts[0]]
                     if (-not $v) { continue }
@@ -124,7 +127,7 @@ function Get-BatTweakList {
                 $od = ''
                 if ($t.ComboDescriptions) { $dp = $t.ComboDescriptions.PSObject.Properties[$opt]; if ($dp) { $od = [string]$dp.Value } }
                 $raw = [pscustomobject]@{ registry = $regs; service = @(); ScheduledTask = @(); InvokeScript = @(); UndoScript = @(); check = ''; restartExplorer = $false }
-                New-BatTweakObject -Id "$id::$opt" -Name "${title}: $opt" -Desc $od -Cat $cat -Type 'Checkbox' -Risk $risk -Min $min -Max $max -Raw $raw
+                New-BatTweakObject -Id "$id::$opt" -Name "${title}: $opt" -Desc $od -Cat $cat -Type 'ComboOption' -Risk $risk -Min $min -Max $max -Raw $raw -ComboGroup $id -ComboTitle $title -ComboIndex $k -ComboOption $opt
             }
             continue
         }
@@ -148,17 +151,7 @@ function Get-BatTweakList {
         $chk = ''
         if ($o.check) { $chk = [string]$o.check } elseif ($t.check) { $chk = [string]$t.check }
 
-        # WinUtil toggles store the value for the switch being ON. When ON is the Windows default
-        # (DefaultState true) the useful tweak is turning it OFF, so Value and OriginalValue swap.
-        if ($type -eq 'Toggle' -and $regs.Count -gt 0) {
-            $allDefault = (@($regs | Where-Object { $_.DefaultState -ne 'true' }).Count -eq 0)
-            if ($allDefault) {
-                foreach ($r in $regs) { $tmp = $r.Value; $r.Value = $r.OriginalValue; $r.OriginalValue = $tmp }
-                $tmpS = $inv; $inv = $und; $und = $tmpS
-                $title = "$title - turn off"
-            }
-            else { $title = "$title - turn on" }
-        }
+        # WinUtil toggles: Value = switch ON, OriginalValue = switch OFF. The UI shows them as switches the same way.
 
         $raw = [pscustomobject]@{ registry = $regs; service = $svc; ScheduledTask = @(); InvokeScript = $inv; UndoScript = $und; check = $chk; restartExplorer = $false }
         New-BatTweakObject -Id $id -Name $title -Desc $desc -Cat $cat -Type $type -Risk $risk -Min $min -Max $max -Raw $raw
