@@ -1,0 +1,87 @@
+{
+  "default": "dark",
+  "defaultAccent": "turquoise",
+  "palette": "Material You style: warm charcoal / soft light surfaces tinted by the chosen accent, plus pure AMOLED black",
+  "themes": {
+    "dark": {
+      "Bg": "#131214",
+      "Side": "#19181B",
+      "Panel": "#1F1D21",
+      "Panel2": "#29272C",
+      "Line": "#36333A",
+      "Fg": "#F4F4F5",
+      "Dim": "#A1A1AA",
+      "Accent": "#2DD4BF",
+      "Accent2": "#38BDF8",
+      "Hover": "#36333A",
+      "OnHover": "#F4F4F5",
+      "OnAccent": "#09090B"
+    },
+    "light": {
+      "Bg": "#F8FAFC",
+      "Side": "#F1F5F9",
+      "Panel": "#FFFFFF",
+      "Panel2": "#E8EDF3",
+      "Line": "#D8DEE6",
+      "Fg": "#18181B",
+      "Dim": "#52525B",
+      "Accent": "#0F766E",
+      "Accent2": "#0284C7",
+      "Hover": "#E2E8F0",
+      "OnHover": "#18181B",
+      "OnAccent": "#FFFFFF"
+    },
+    "amoled": {
+      "Bg": "#000000",
+      "Side": "#000000",
+      "Panel": "#09090B",
+      "Panel2": "#121214",
+      "Line": "#1C1C21",
+      "Fg": "#F4F4F5",
+      "Dim": "#A1A1AA",
+      "Accent": "#2DD4BF",
+      "Accent2": "#38BDF8",
+      "Hover": "#1C1C21",
+      "OnHover": "#F4F4F5",
+      "OnAccent": "#000000"
+    }
+  },
+  "accents": {
+    "turquoise": {
+      "label": "Turquoise",
+      "dark": "#2DD4BF",
+      "light": "#0F766E",
+      "accent2": "#38BDF8"
+    },
+    "blue": {
+      "label": "Blue",
+      "dark": "#60A5FA",
+      "light": "#2563EB",
+      "accent2": "#38BDF8"
+    },
+    "violet": {
+      "label": "Violet",
+      "dark": "#A78BFA",
+      "light": "#7C3AED",
+      "accent2": "#C084FC"
+    },
+    "emerald": {
+      "label": "Emerald",
+      "dark": "#34D399",
+      "light": "#059669",
+      "accent2": "#2DD4BF"
+    },
+    "amber": {
+      "label": "Amber",
+      "dark": "#FBBF24",
+      "light": "#D97706",
+      "accent2": "#F59E0B"
+    },
+    "rose": {
+      "label": "Rose",
+      "dark": "#FB7185",
+      "light": "#E11D48",
+      "accent2": "#F43F5E"
+    }
+  }
+}
