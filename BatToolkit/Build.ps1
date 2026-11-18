@@ -29,8 +29,13 @@ foreach ($rel in 'Logic\Core.ps1', 'Logic\Apps.ps1', 'Logic\Update.ps1', 'Logic\
 }
 [void]$sb.AppendLine('Start-BatToolkit')
 
-# UTF-8 with BOM so Windows PowerShell 5.1 reads it correctly
-[IO.File]::WriteAllText($out, $sb.ToString(), (New-Object Text.UTF8Encoding $true))
+# A BOM at the start breaks "irm | iex" (it becomes a stray character before the first #).
+# Pure ASCII needs no BOM. Only when non-ASCII text slips in do we add one so 5.1 reads the file.
+$text = $sb.ToString()
+$ascii = -not ($text -cmatch '[^\x00-\x7F]')
+[IO.File]::WriteAllText($out, $text, (New-Object Text.UTF8Encoding (-not $ascii)))
+if (-not $ascii) { Write-Host 'Warning: non-ASCII characters found, a BOM was added. "irm | iex" will not work with this build.' -ForegroundColor Yellow }
+Copy-Item -LiteralPath $out -Destination (Join-Path (Split-Path $root -Parent) 'BatToolkit.ps1') -Force
 
 $errs = $null; $tok = $null
 [void][System.Management.Automation.Language.Parser]::ParseFile($out, [ref]$tok, [ref]$errs)

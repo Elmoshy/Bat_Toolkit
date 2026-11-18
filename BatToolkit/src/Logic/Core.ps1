@@ -60,6 +60,28 @@ function Write-BatLog {
     $Sync.Log.Enqueue(('[{0}] [{1,-4}] {2}' -f (Get-Date -Format 'HH:mm:ss'), $Level, $Message))
 }
 
+# Mirrors log lines to the console window with colors so the terminal doubles as a live monitor.
+# Set BAT_QUIET=1 to turn it off.
+function Write-BatConsole {
+    param([string]$Text)
+    if ($env:BAT_QUIET) { return }
+    foreach ($ln in ($Text -split "`r?`n")) {
+        if (-not $ln) { continue }
+        $color = 'Gray'
+        if ($ln -match '^\[[^\]]*\] \[(\w+)\s*\]') {
+            switch ($Matches[1]) {
+                'OK' { $color = 'Green' }
+                'WARN' { $color = 'Yellow' }
+                'ERR' { $color = 'Red' }
+                'CMD' { $color = 'Cyan' }
+                'STEP' { $color = 'White' }
+                'OUT' { $color = 'DarkGray' }
+            }
+        }
+        try { Write-Host $ln -ForegroundColor $color } catch { }
+    }
+}
+
 function Start-BatLogPump {
     $timer = New-Object System.Windows.Threading.DispatcherTimer
     $timer.Interval = [TimeSpan]::FromMilliseconds(200)
@@ -73,6 +95,7 @@ function Start-BatLogPump {
             if ($box.Text.Length -gt 300000) { $box.Text = $box.Text.Substring($box.Text.Length - 200000) }
             $box.ScrollToEnd()
             try { [IO.File]::AppendAllText($Sync.LogFile, $sb.ToString(), [Text.Encoding]::UTF8) } catch { }
+            Write-BatConsole $sb.ToString()
         }
     })
     $timer.Start()

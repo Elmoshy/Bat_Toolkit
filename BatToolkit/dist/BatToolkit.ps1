@@ -1,4 +1,4 @@
-﻿# BAT TOOLKIT - compiled single file build. Do not edit: edit src and run Build.ps1
+# BAT TOOLKIT - compiled single file build. Do not edit: edit src and run Build.ps1
 $global:BatEmbedded = @{}
 $global:BatEntry = $PSCommandPath
 $global:BatChild = ($args -contains '--child')
@@ -2935,6 +2935,28 @@ function Write-BatLog {
     $Sync.Log.Enqueue(('[{0}] [{1,-4}] {2}' -f (Get-Date -Format 'HH:mm:ss'), $Level, $Message))
 }
 
+# Mirrors log lines to the console window with colors so the terminal doubles as a live monitor.
+# Set BAT_QUIET=1 to turn it off.
+function Write-BatConsole {
+    param([string]$Text)
+    if ($env:BAT_QUIET) { return }
+    foreach ($ln in ($Text -split "`r?`n")) {
+        if (-not $ln) { continue }
+        $color = 'Gray'
+        if ($ln -match '^\[[^\]]*\] \[(\w+)\s*\]') {
+            switch ($Matches[1]) {
+                'OK' { $color = 'Green' }
+                'WARN' { $color = 'Yellow' }
+                'ERR' { $color = 'Red' }
+                'CMD' { $color = 'Cyan' }
+                'STEP' { $color = 'White' }
+                'OUT' { $color = 'DarkGray' }
+            }
+        }
+        try { Write-Host $ln -ForegroundColor $color } catch { }
+    }
+}
+
 function Start-BatLogPump {
     $timer = New-Object System.Windows.Threading.DispatcherTimer
     $timer.Interval = [TimeSpan]::FromMilliseconds(200)
@@ -2948,6 +2970,7 @@ function Start-BatLogPump {
             if ($box.Text.Length -gt 300000) { $box.Text = $box.Text.Substring($box.Text.Length - 200000) }
             $box.ScrollToEnd()
             try { [IO.File]::AppendAllText($Sync.LogFile, $sb.ToString(), [Text.Encoding]::UTF8) } catch { }
+            Write-BatConsole $sb.ToString()
         }
     })
     $timer.Start()
@@ -5285,14 +5308,17 @@ function Start-BatToolkit {
     $isAdmin = Test-BatAdmin
     $canRelaunch = ($global:BatEntry -and (Test-Path -LiteralPath $global:BatEntry))
 
-    # Open a fresh hidden copy (elevated when needed) so the console you started from is released
-    # and only the tool window stays. Set BAT_DEBUG=1 to keep the console visible.
+    # Elevation needs a fresh process. The copy opens its own console window that works as a live
+    # log monitor next to the tool window. Set BAT_QUIET=1 to hide that console, BAT_DEBUG=1 to
+    # skip the relaunch.
     if ($canRelaunch -and -not $global:BatChild -and -not $env:BAT_DEBUG) {
         try {
             $exe = (Get-Process -Id $PID).Path
-            $argList = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-STA', '-WindowStyle', 'Hidden', '-File', ('"{0}"' -f $global:BatEntry), '--child')
-            if ($isAdmin) { Start-Process -FilePath $exe -ArgumentList $argList -WindowStyle Hidden -ErrorAction Stop }
-            else { Start-Process -FilePath $exe -ArgumentList $argList -Verb RunAs -WindowStyle Hidden -ErrorAction Stop }
+            $argList = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-STA', '-File', ('"{0}"' -f $global:BatEntry), '--child')
+            $style = 'Normal'
+            if ($env:BAT_QUIET) { $style = 'Hidden' }
+            if ($isAdmin) { Start-Process -FilePath $exe -ArgumentList $argList -WindowStyle $style -ErrorAction Stop }
+            else { Start-Process -FilePath $exe -ArgumentList $argList -Verb RunAs -WindowStyle $style -ErrorAction Stop }
         }
         catch {
             [void][System.Windows.MessageBox]::Show('BAT TOOLKIT needs Administrator permission. The request was declined or failed.', 'BAT TOOLKIT', 'OK', 'Warning')
@@ -5303,11 +5329,24 @@ function Start-BatToolkit {
         [void][System.Windows.MessageBox]::Show('BAT TOOLKIT must run as Administrator. Open PowerShell as admin and run it again.', 'BAT TOOLKIT', 'OK', 'Warning')
         return
     }
+    if (-not $env:BAT_QUIET) {
+        try { $Host.UI.RawUI.WindowTitle = 'BAT TOOLKIT - live log' } catch { }
+        Write-Host ''
+        Write-Host '  BAT TOOLKIT - live log' -ForegroundColor Cyan
+        Write-Host '  Every operation is printed here as it runs. Closing this window closes the tool.' -ForegroundColor DarkGray
+        Write-Host ''
+    }
     try { Start-BatApp }
     catch {
         $msg = $_.Exception.Message
         try { [IO.File]::AppendAllText((Join-Path $env:TEMP 'BatToolkit-error.log'), ("{0}  {1}`r`n{2}`r`n" -f (Get-Date), $msg, $_.ScriptStackTrace)) } catch { }
         [void][System.Windows.MessageBox]::Show("BAT TOOLKIT stopped:`n`n$msg", 'BAT TOOLKIT', 'OK', 'Error')
+    }
+    # The window opened by the relaunch stays so the session log can be read after the tool closes
+    if ($global:BatChild -and -not $env:BAT_QUIET) {
+        Write-Host ''
+        Write-Host ("  Session ended. Log file: {0}" -f $Sync.LogFile) -ForegroundColor DarkGray
+        try { [void](Read-Host '  Press Enter to close this window') } catch { }
     }
 }
 
